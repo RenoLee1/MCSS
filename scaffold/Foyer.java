@@ -17,7 +17,7 @@ public class Foyer {
         return availableNurses.poll();
     }
 
-    public synchronized void departFromED(){}
+    public synchronized void departFromED(){ notifyAll(); }
 
     public synchronized void arriveAtED(Patient patient) {
         while (patient.allocated != true) {
@@ -26,6 +26,7 @@ public class Foyer {
                 nurse.assignPatient(patient);
                 patient.allocated = true;
                 System.out.println(patient.getId() + "has been assigned to " + nurse.getNurseId());
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

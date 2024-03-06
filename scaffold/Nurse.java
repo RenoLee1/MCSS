@@ -20,6 +20,7 @@ public class Nurse extends Thread{
         this.isAvailable = true;
     }
 
+    // Allocate Nurse to a patient
     public synchronized void assignPatient(Patient patient) {
         this.currentPatient = patient;
         this.isAvailable = false;
@@ -29,6 +30,7 @@ public class Nurse extends Thread{
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             synchronized (this) {
+
                 while (currentPatient == null) {
                     try {
                         wait();
@@ -40,9 +42,26 @@ public class Nurse extends Thread{
             }
 
             synchronized (this) {
-                triage.addNurse(this);
-                
-                triage.removeNurse();
+                triage.arriveTriage(currentPatient);
+
+                if (currentPatient.Severe() == true) {
+                    while (treatment.available == true){
+                        try {
+                            wait();
+                        }catch (InterruptedException e){}
+                        triage.leaveTriage();
+                        treatment.arriveTreatment(currentPatient);
+                    }
+
+                    try {
+                        wait();
+                    }catch (InterruptedException e){}
+
+                    treatment.leaveTreatment();
+
+                }else{
+                    triage.leaveTriage();
+                }
             }
 
             // 处理病人

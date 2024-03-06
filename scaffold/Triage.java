@@ -1,18 +1,23 @@
 public class Triage {
-    private boolean available = true;
-    private Nurse nurse;
+    public volatile boolean available = true;
+    private Patient patient = null;
 
-    public synchronized void addNurse(Nurse nurse){
-        while (nurse != null) {
+
+    public synchronized void arriveTriage(Patient patient){
+        while (available != true) {
             try {
                 wait();
-            }catch (InterruptedException e) {}
+            }catch (InterruptedException e){}
         }
-        this.nurse = nurse;
+        System.out.println("welcome " + patient.getId() + " to Triage");
+        this.patient=patient;
+        available = false;
     }
 
-    public synchronized void removeNurse(){
-        this.nurse = null;
+    public synchronized void leaveTriage(){
+        System.out.println("patient " + patient.getId()+ " left triage");
+        patient = null;
+        available = true;
         notifyAll();
     }
 }
