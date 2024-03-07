@@ -1,3 +1,5 @@
+import static java.lang.Thread.sleep;
+
 public class Treatment {
     private Patient patient = null;
     public volatile boolean available = true;
@@ -13,33 +15,35 @@ public class Treatment {
 
         orderlies.numberOfOrderlies -= Params.TRANSFER_ORDERLIES;
 
-        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
         System.out.println(patient.toString()+ " leaves triage");
 
         this.patient = patient;
         available = false;
         triage.available = true;
         try {
-            Thread.sleep(Params.TRANSFER_TIME);
+
+            sleep(Params.TRANSFER_TIME);
 
             orderlies.numberOfOrderlies += Params.TRANSFER_ORDERLIES;
 
             System.out.println(patient.toString() + " enters treatment room");
-            System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+            System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
         }catch (InterruptedException e){}
 
         notifyAll();
 
+        System.out.println(triage.available + "?????");
+
     }
 
     public synchronized void leaveTreatment(){
-        while (patient == null){
+        while (patient != null){
             try {
                 wait();
             }catch (InterruptedException e) {}
         }
 
-        notifyAll();
 //        System.out.println("Patient "+patient.getId()+ " left treatment since he has been treated" );
     }
 
@@ -47,6 +51,7 @@ public class Treatment {
         this.specialist = specialist;
     }
 
+    // Specialist treat patient
     public synchronized void treatPatient(){
         while (patient == null){
             try {
@@ -57,20 +62,21 @@ public class Treatment {
         System.out.println("Specialist enters treatment room");
         System.out.println(patient.toString() + " treatment started");
         try {
-            specialist.sleep(Params.TREATMENT_TIME);
+            sleep(Params.TREATMENT_TIME);
         }catch (InterruptedException e){}
 
         patient.treated = true;
         System.out.println(patient.toString() + " treatment complete");
         patient = null;
+        notifyAll();
     }
 
     public synchronized void specialistGameTime(){
         try {
             System.out.println("Specialist leaves treatment room");
-            specialist.sleep(Params.SPECIALIST_AWAY_TIME);
-            available =true;
-
+            sleep(Params.SPECIALIST_AWAY_TIME);
+            available = true;
+            notifyAll();
         }catch (InterruptedException e){}
     }
 }

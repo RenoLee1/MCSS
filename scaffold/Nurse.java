@@ -22,14 +22,13 @@ public class Nurse extends Thread{
 
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
+
             synchronized (this) {
 
                 currentPatient = foyer.getPatient(this);
-            }
-
-            synchronized (this) {
 
                 triage.arriveTriage(currentPatient, this.orderlies, this);
+
                 try {
                     this.sleep(Params.TRIAGE_TIME);
                 }catch (InterruptedException e){}
@@ -71,9 +70,9 @@ public class Nurse extends Thread{
             synchronized (this) {
                 currentPatient = null;
                 isAvailable = true;
+                System.out.println("Nurse "+this.id + " is free");
+                foyer.addNurse(this);
             }
-            System.out.println("Nurse "+this.id + " is free");
-            foyer.addNurse(this);
         }
     }
 

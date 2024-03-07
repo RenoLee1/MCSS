@@ -5,6 +5,8 @@ public class Triage {
 
     public synchronized void arriveTriage(Patient patient, Orderlies orderlies, Nurse nurse){
         while (available != true || orderlies.numberOfOrderlies < Params.TRANSFER_ORDERLIES) {
+            System.out.println("Nurse "+nurse.getNurseId()+"  is waiting!!!");
+            System.out.println(available+"!!!");
             try {
                 wait();
             }catch (InterruptedException e){}
@@ -12,7 +14,7 @@ public class Triage {
 
         orderlies.numberOfOrderlies -= Params.TRANSFER_ORDERLIES;
 
-        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
         System.out.println(patient.toString()+ " leaves Foyer");
 
         try {
@@ -22,11 +24,11 @@ public class Triage {
         orderlies.numberOfOrderlies += Params.TRANSFER_ORDERLIES;
 
         System.out.println(patient.toString() + " enters Triage");
-        System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+        System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
 
         this.patient=patient;
         available = false;
-        notifyAll();
+
     }
 
     public synchronized void leaveTriage(){

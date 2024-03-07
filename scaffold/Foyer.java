@@ -41,7 +41,7 @@ public class Foyer {
         }
 
         orderlies.numberOfOrderlies -= Params.TRANSFER_ORDERLIES;
-        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
         if (patient.Severe() == true){
             System.out.println(patient.toString()+ " leaves treatment room");
         }else {
@@ -54,9 +54,8 @@ public class Foyer {
 
             orderlies.numberOfOrderlies += Params.TRANSFER_ORDERLIES;
             System.out.println("Patient " + patient.getId()+" enters Foyer.");
-            System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+            System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
 
-            notifyAll();
         }catch (InterruptedException e){}
 
         System.out.println(patient.toString()+" discharged from ED");
@@ -65,7 +64,7 @@ public class Foyer {
                 wait();
             }catch (InterruptedException e){}
         }
-        System.out.println();
+
     }
 
     public synchronized void arriveAtED(Patient patient){
