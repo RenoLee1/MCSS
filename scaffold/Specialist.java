@@ -6,15 +6,11 @@ public class Specialist extends Thread{
     }
 
     public void run(){
-        synchronized (this){
-            while (treatment.readyToTreat != true){
-                try {
-                    wait();
-                }catch (InterruptedException e){}
+        while (!Thread.currentThread().isInterrupted()){
+            synchronized (this){
+                treatment.treatPatient();
+                treatment.specialistGameTime();
             }
-            treatment.specialistGameTime();
-            treatment.addSpecialist(this);
-
         }
     }
 

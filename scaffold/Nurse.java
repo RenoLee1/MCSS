@@ -20,47 +20,48 @@ public class Nurse extends Thread{
         this.isAvailable = true;
     }
 
-    // Allocate Nurse to a patient
-    public synchronized void assignPatient(Patient patient) {
-        this.currentPatient = patient;
-        this.isAvailable = false;
-        notify();
-    }
-
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             synchronized (this) {
 
-                while (currentPatient == null) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                }
+                currentPatient = foyer.getPatient(this);
             }
 
             synchronized (this) {
-                triage.arriveTriage(currentPatient);
+
+                triage.arriveTriage(currentPatient, this.orderlies, this);
+                try {
+                    this.sleep(Params.TRIAGE_TIME);
+                }catch (InterruptedException e){}
+
 
                 if (currentPatient.Severe() == true) {
-                    while (treatment.available == true){
-                        try {
-                            wait();
-                        }catch (InterruptedException e){}
-                        triage.leaveTriage();
-                        treatment.arriveTreatment(currentPatient);
-                    }
 
-                    try {
-                        wait();
-                    }catch (InterruptedException e){}
+//                    triage.leaveTriage();
+                    treatment.arriveTreatment(currentPatient, orderlies, this, triage);
+
+//                    while (treatment.available == true){
+//                        try {
+//                            wait();
+//                        }catch (InterruptedException e){}
+//                        triage.leaveTriage();
+//                        treatment.arriveTreatment(currentPatient);
+//                    }
+
+//                    while (currentPatient.treated != true){
+//                        try {
+//                            wait();
+//                        }catch (InterruptedException e) {}
+//                    }
+
 
                     treatment.leaveTreatment();
 
+                    foyer.arriveAtFoyerWaitForDischarge(currentPatient, this, orderlies);
+
                 }else{
                     triage.leaveTriage();
+                    foyer.arriveAtFoyerWaitForDischarge(currentPatient, this, orderlies);
                 }
             }
 
@@ -71,6 +72,7 @@ public class Nurse extends Thread{
                 currentPatient = null;
                 isAvailable = true;
             }
+            System.out.println("Nurse "+this.id + " is free");
             foyer.addNurse(this);
         }
     }

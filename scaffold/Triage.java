@@ -3,21 +3,38 @@ public class Triage {
     private Patient patient = null;
 
 
-    public synchronized void arriveTriage(Patient patient){
-        while (available != true) {
+    public synchronized void arriveTriage(Patient patient, Orderlies orderlies, Nurse nurse){
+        while (available != true || orderlies.numberOfOrderlies < Params.TRANSFER_ORDERLIES) {
             try {
                 wait();
             }catch (InterruptedException e){}
         }
-        System.out.println("welcome " + patient.getId() + " to Triage");
+
+        orderlies.numberOfOrderlies -= Params.TRANSFER_ORDERLIES;
+
+        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+        System.out.println(patient.toString()+ " leaves Foyer");
+
+        try {
+            Thread.sleep(Params.TRANSFER_TIME);
+        }catch (InterruptedException e){}
+
+        orderlies.numberOfOrderlies += Params.TRANSFER_ORDERLIES;
+
+        System.out.println(patient.toString() + " enters Triage");
+        System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + "(" + orderlies.numberOfOrderlies+ " free)");
+
         this.patient=patient;
         available = false;
+        notifyAll();
     }
 
     public synchronized void leaveTriage(){
-        System.out.println("patient " + patient.getId()+ " left triage");
-        patient = null;
-        available = true;
-        notifyAll();
+        if (patient.Severe() == true){
+            patient = null;
+        }else {
+            patient = null;
+            available = true;
+        }
     }
 }
