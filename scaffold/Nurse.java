@@ -25,7 +25,7 @@ public class Nurse extends Thread{
 
             synchronized (this) {
 
-                currentPatient = foyer.getPatient(this);
+                currentPatient = foyer.getPatient(this, orderlies);
 
                 triage.arriveTriage(currentPatient, this.orderlies, this);
 

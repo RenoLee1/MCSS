@@ -73,7 +73,7 @@ public class Foyer {
         notifyAll();
     }
 
-    public synchronized Patient getPatient(Nurse nurse){
+    public synchronized Patient getPatient(Nurse nurse, Orderlies orderlies){
 
         while (arrivedPatients.isEmpty()){
             try {
@@ -85,6 +85,16 @@ public class Foyer {
         Patient pickedUpPatient = arrivedPatients.poll();
         System.out.println(pickedUpPatient.toString() + " admitted to ED");
         System.out.println(pickedUpPatient.toString() + " allocated to Nurse " + nurse.getNurseId());
+
+        while (orderlies.numberOfOrderlies < Params.TRANSFER_ORDERLIES){
+            try {
+                wait();
+            }catch (InterruptedException e){}
+        }
+        orderlies.numberOfOrderlies -= Params.TRANSFER_ORDERLIES;
+
+        System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
+        System.out.println(pickedUpPatient.toString()+ " leaves Foyer");
         return pickedUpPatient;
     }
 

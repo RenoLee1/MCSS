@@ -20,7 +20,7 @@ public class Treatment {
 
         this.patient = patient;
         available = false;
-        triage.available = true;
+
         try {
 
             sleep(Params.TRANSFER_TIME);
@@ -31,6 +31,7 @@ public class Treatment {
             System.out.println("Nurse "+nurse.getNurseId()+" releases 3 orderlies" + " (" + orderlies.numberOfOrderlies+ " free)");
         }catch (InterruptedException e){}
 
+        triage.available = true;
         notifyAll();
 
         System.out.println(triage.available + "?????");
