@@ -8,6 +8,8 @@ public class Treatment {
     // a flag indicating whether treatment room is available for patient or not
     protected volatile boolean available = true;
 
+    private volatile boolean specialistPresent = false;
+
     // patient arrives treatment room
     public synchronized void arriveTreatment(Patient patient, Orderlies orderlies, Nurse nurse, Triage triage){
         while(available != true){
@@ -33,8 +35,8 @@ public class Treatment {
     }
 
     // patient leaves treatment room
-    public synchronized void leaveTreatment(Patient patient, Nurse nurse, Orderlies orderlies){
-        while (patient.treated == false || orderlies.numberOfOrderlies < 3){
+    public synchronized void leaveTreatment(Patient patients, Nurse nurse, Orderlies orderlies){
+        while (patients.treated == false || orderlies.numberOfOrderlies < 3 || specialistPresent){
             try {
                 System.out.println("Waiting!!!");
                 wait();
@@ -45,7 +47,7 @@ public class Treatment {
         int freeOrderlies = orderlies.recruitOrderlies();
 
         System.out.println("Nurse "+nurse.getNurseId()+" recruits 3 orderlies" + " (" + freeOrderlies+ " free)");
-        System.out.println(patient.toString()+ " leaves treatment room");
+        System.out.println(patients.toString()+ " leaves treatment room");
     }
 
     // Specialist treat patient
@@ -58,12 +60,14 @@ public class Treatment {
         }
 
         System.out.println(patient.toString() + " treatment started");
+        specialistPresent = true;
         try {
             sleep(Params.TREATMENT_TIME);
         }catch (InterruptedException e){}
 
         patient.treated = true;
         System.out.println(patient.toString() + " treatment complete");
+        specialistPresent = false;
         notifyAll();
         patient = null;
     }
