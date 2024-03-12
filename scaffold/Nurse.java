@@ -7,7 +7,6 @@ public class Nurse extends Thread{
     private Treatment treatment;
 
     private Patient currentPatient = null;
-    private boolean isAvailable;
 
     //Constructor
     public Nurse(int id, Foyer foyer, Triage triage, Orderlies orderlies, Treatment treatment) {
@@ -17,7 +16,6 @@ public class Nurse extends Thread{
         this.triage = triage;
         this.orderlies = orderlies;
         this.treatment = treatment;
-        this.isAvailable = true;
     }
 
     public void run() {
@@ -29,47 +27,25 @@ public class Nurse extends Thread{
 
                 triage.arriveTriage(currentPatient, this.orderlies, this);
 
-                try {
-                    this.sleep(Params.TRIAGE_TIME);
-                }catch (InterruptedException e){}
-
 
                 if (currentPatient.Severe() == true) {
 
-//                    triage.leaveTriage();
+                    triage.leaveTriage(orderlies, this);
                     treatment.arriveTreatment(currentPatient, orderlies, this, triage);
 
-//                    while (treatment.available == true){
-//                        try {
-//                            wait();
-//                        }catch (InterruptedException e){}
-//                        triage.leaveTriage();
-//                        treatment.arriveTreatment(currentPatient);
-//                    }
-
-//                    while (currentPatient.treated != true){
-//                        try {
-//                            wait();
-//                        }catch (InterruptedException e) {}
-//                    }
-
-
-                    treatment.leaveTreatment();
+                    treatment.leaveTreatment(currentPatient, this, orderlies);
 
                     foyer.arriveAtFoyerWaitForDischarge(currentPatient, this, orderlies);
 
                 }else{
-                    triage.leaveTriage();
+                    triage.leaveTriage(orderlies, this);
                     foyer.arriveAtFoyerWaitForDischarge(currentPatient, this, orderlies);
                 }
             }
 
-            // 处理病人
-            // 这里应该包含处理病人的逻辑，例如分诊等
-
+            // patient has left, waiting for the next patient
             synchronized (this) {
                 currentPatient = null;
-                isAvailable = true;
                 System.out.println("Nurse "+this.id + " is free");
                 foyer.addNurse(this);
             }
@@ -78,5 +54,9 @@ public class Nurse extends Thread{
 
     public int getNurseId() {
         return this.id;
+    }
+
+    public void getPatient(Patient patient){
+        this.currentPatient = patient;
     }
 }

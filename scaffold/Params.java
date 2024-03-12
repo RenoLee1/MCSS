@@ -13,7 +13,7 @@ public class Params {
   public final static int NURSES = 3;
   
   //the number of orderlies in the emergency department
-  public final static int ORDERLIES = 8;
+  public final static int ORDERLIES = 10;
   
   //the number of orderlies required to transfer a patient
   public final static int TRANSFER_ORDERLIES = 3;
@@ -31,7 +31,7 @@ public class Params {
   public final static int TRANSFER_TIME = 200;
   
   //the time a specialist spends elsewhere between treating patients
-  public final static int SPECIALIST_AWAY_TIME = 500;
+  public final static int SPECIALIST_AWAY_TIME = 200;
   
   //the maximum amount of time between patient arrivals at ED (before admission)
   public final static int MAX_ARRIVE_INTERVAL = 2000;
